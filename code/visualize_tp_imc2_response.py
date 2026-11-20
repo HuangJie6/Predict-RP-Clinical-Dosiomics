@@ -3,7 +3,7 @@
 Reconstructs the locked 14-feature model and requires agreement with all 155
 saved predictions. Low/high settings are training Q25/Q75, NOT new patient
 groups. All four settings use the same 108 training background profiles.
-Original files and the manuscript are never modified.
+Source data are read-only.
 """
 from __future__ import annotations
 

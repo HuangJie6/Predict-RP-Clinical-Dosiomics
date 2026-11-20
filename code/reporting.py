@@ -1,4 +1,4 @@
-"""Generate journal tables and vector-derived 600-dpi figures from frozen predictions."""
+"""Generate tables and vector-derived 600-dpi figures from saved predictions."""
 from __future__ import annotations
 
 from pathlib import Path

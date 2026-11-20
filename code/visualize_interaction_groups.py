@@ -1,6 +1,6 @@
 """Describe four TP/CEA-by-Imc2 strata using existing, frozen predictions.
 
-No training, cut-point optimization, cohort changes, or manuscript edits.
+Uses saved predictions, fixed cut points, and existing cohort assignments.
 Example: python visualize_interaction_groups.py
 All cut points are medians of the original 108 training patients.
 """
@@ -229,7 +229,7 @@ def main():
     notes = f"""Four-group visualization
 Model: {MODELS[args.model]}
 Data: existing 155 cases, fixed training/validation/test allocation (108/23/24).
-No model was fitted, no split was changed, and no manuscript was edited.
+The analysis uses the existing model predictions and cohort assignments.
 
 Training cutoffs (exact values used):
 TP: {cutoffs['TotalProtein']:.12g}

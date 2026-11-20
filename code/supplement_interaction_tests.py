@@ -1,6 +1,6 @@
 """S2 observed outcomes and locked exploratory logistic interaction tests.
 Run with the original modelling virtual environment (statsmodels==0.14.5).
-Does not edit manuscript, feature selection, split, or original model outputs.
+Uses the existing selected features and cohort assignments.
 """
 import json
 import warnings
@@ -180,7 +180,7 @@ def main():
                        'SHAP of an engineered feature is distinct from off-diagonal SHAP interaction values.',
                        'OR is the ratio of one-SD clinical odds ratios for a one-SD increase in Imc2, not high-high vs low-low OR.']}
     (OUT/'Analysis_Audit.json').write_text(json.dumps(audit,indent=2),encoding='utf-8')
-    print('Completed. Manuscript and source files unchanged. Output:',OUT)
+    print('Analysis complete. Output:',OUT)
 
 
 if __name__=='__main__': main()

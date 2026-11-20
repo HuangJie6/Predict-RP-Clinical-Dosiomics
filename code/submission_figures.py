@@ -1,4 +1,4 @@
-"""Regenerate individually uploadable figures for the clinical–dosiomic manuscript."""
+"""Generate separate figures for clinical–dosiomic model analysis."""
 import argparse
 from pathlib import Path
 

@@ -1,56 +1,86 @@
-# Clinical and whole-lung dosiomic interactions for radiation pneumonitis prediction
+# Clinical–dosiomic interaction analysis for radiation pneumonitis prediction
 
-Analysis code and extracted whole-lung dose features for **Clinical and whole-lung dosiomic features for radiation pneumonitis prediction in esophageal cancer receiving concurrent chemoradiotherapy**.
+Python code for whole-lung dose-feature extraction, feature selection, random-forest prediction, and interaction analysis in patients with esophageal cancer receiving concurrent chemoradiotherapy.
 
-Authors: Jie Huang, Xu Chen, Jiantao Wang, Shuai Liu, and Xueling Li.
-Correspondence: Xueling Li, Hefei Cancer Hospital, Chinese Academy of Sciences; xlli@cmpt.ac.cn.
-Target journal: International Journal of Computer Assisted Radiology and Surgery. This repository does not imply journal acceptance.
+## Contents
 
-## Repository contents
+- `code/`: analysis scripts and configuration files.
+- `features/whole_lung_dosiomic_features.csv`: 155 samples with 93 extracted dose features and anonymous sample IDs.
+- `requirements.txt`: dependencies for feature selection, modeling, and visualization.
+- `requirements_extraction.txt`: additional dependencies for dose-feature extraction.
 
-- `code/`: feature extraction, training-only selection, five random-forest models, figure/table generation, SHAP and exploratory logistic interaction tests.
-- `features/whole_lung_dosiomic_features.csv`: the only public patient-level table, containing 155 anonymous samples and 93 original-dose features.
-- `requirements.txt`: analysis dependencies. `requirements_extraction.txt`: optional dose-extraction dependencies.
+## Installation
 
-The table contains no RP labels, clinical variables, patient identifiers, split assignments, raw images, dose volumes or masks. Full prediction-model reproduction therefore requires authorized access to the private clinical/outcome and split information; the public table alone is not a labeled machine-learning benchmark. Other study data may be requested from the corresponding author, subject to institutional approval and patient privacy requirements.
+Use Python 3.10 or newer in a virtual environment:
 
-## Inspect the public data
+```bash
+python -m pip install -r requirements.txt
+```
 
-Python 3.10 or newer:
+## Public feature table
 
-```cmd
+```bash
 python code/run_analysis.py --stage validate-public
 ```
 
-This validation uses the standard library and checks row/column counts, unique anonymous IDs and finite feature values.
+This command uses the Python standard library to check dimensions, unique sample IDs, and finite feature values. The table contains original-scale whole-lung dosiomic features extracted with PyRadiomics. Extraction used a 1-Gy bin width and 2-mm isotropic voxel spacing. See `features/README.md` for the column structure.
 
-## Reproduce with authorized private inputs
+Clinical variables, RP labels, cohort assignments, images, dose volumes, and masks are not included. Supervised analyses require the corresponding private inputs described below.
 
-Install `requirements.txt` in an isolated Python environment. Put `cohort.csv` and `dose_radiomics.csv` in `code/data_private/` (ignored by Git).
+## Run the analysis
 
-`cohort.csv` requires `patient_id`, `label` (0/1), `cohort` (training/validation/test) and the clinical candidate columns listed in `code/config/private_input_schema.json`. `dose_radiomics.csv` requires the same private `patient_id`, the 93 `dose_original_*` columns, and `label`. Public IDs must be linked through the separately controlled mapping by an authorized custodian; never infer an analysis split from public row order.
+Place authorized private inputs in `code/data_private/`:
 
-```cmd
-python -m pip install -r requirements.txt
+| File | Required contents |
+| --- | --- |
+| `cohort.csv` | Patient ID, binary RP label, cohort assignment, and clinical variables |
+| `dose_radiomics.csv` | Matching patient ID, RP label, and 93 `dose_original_*` columns |
+
+The clinical column names are specified in `code/config/private_input_schema.json`. Cohort values are `training`, `validation`, and `test`. Public sample IDs require the separately held mapping to link to clinical records.
+
+```bash
 python code/run_analysis.py --stage all
 ```
 
-Stages may also be run separately: `select`, `models`, `figures`, `supplement`. To rerun only figures/models, provide the frozen `selected_clinical_features.csv` and `selected_dose_radiomics.csv` under `code/data_private/`.
+Individual stages:
 
-The study-specific checks preserve the 155-patient cohort (108/23/24), six selected source predictors and original model settings. They intentionally stop if the selected feature set changes. For a new study, design and validate a new cohort rather than silently bypassing these checks.
+| Stage | Action |
+| --- | --- |
+| `select` | Fit feature selection on the training cohort |
+| `models` | Fit five random forests and calculate performance metrics |
+| `figures` | Generate summary tables, ROC/calibration curves, and SHAP plots |
+| `supplement` | Calculate joint-stratum summaries and logistic interaction tests |
 
-## Methods and outputs
+The modeling stage uses `selected_clinical_features.csv` and `selected_dose_radiomics.csv`, which are generated by `select`. The figure stage requires the modeling outputs.
 
-Selection uses median imputation, missing-value/variance filters, mutual information, between-feature Spearman filtering, and parallel L1 logistic regression and Boruta. Up to 40 candidates per modality enter the latter methods. The six source predictors generate eight native-scale square-root products. Five random forests use 2, 4, 8, 6 and 14 inputs. Training-only fitting, fixed 0.50 classification, stratified bootstrap AUC intervals and paired AUC differences are retained.
+The configuration uses 108 training, 23 validation, and 24 test cases. The runner checks the selected features against the six source predictors used in this analysis and stops if they differ.
 
-`outputs/journal_figures/` contains Fig2 (feature-selection flow), Fig3 (ROC/calibration), Fig4 (six-panel SHAP), and FigS1 (correlations). FigS2 and logistic tests are in `outputs/supplement_S2_logistic/`. Fig1 is the authors' enrollment diagram and is not generated from invented exclusion counts. Table CSVs are generated in `outputs/`; manuscript table numbering maps extracted feature classes to Table2, selected features to Table3, and performance to Table4. All generated/private files remain local.
+## Analysis workflow
 
-Chi-square stratification is an association analysis, not a test of additive interaction. Logistic product tests differ from the square-root predictors and remain exploratory after feature discovery. The original scaling-before-LogisticRegressionCV behavior is preserved for fidelity; full selection was restricted to training patients. This software is research code and is not a clinically validated decision-support tool.
+Feature selection combines missing-value and variance filtering, median imputation, mutual-information ranking, Spearman correlation filtering, and parallel L1-penalized logistic regression and Boruta assessment. Up to 40 candidates per modality enter the latter methods. Preprocessing and selection are fitted on the training cohort. Within the L1-selection pipeline, standardization precedes `LogisticRegressionCV`.
 
-## Optional extraction from authorized images
+Two clinical and four dosiomic predictors generate eight square-root product features on their original scales. The five random-forest models use clinical features, dosiomic features, interaction features, clinical plus dosiomic features, and all three feature groups. Classification uses a probability threshold of 0.50. Evaluation includes stratified bootstrap AUC intervals, paired AUC differences, classification metrics, and calibration curves.
 
-Use 3D Slicer with SlicerRT and `code/slicer/extract_lung_ct_dose.py` for local DICOM processing. `code/resample_dose.py` aligns dose/masks at 2-mm spacing. `code/extract_dose.py` extracts the 93 original-dose features using the 1-Gy bin-width settings in `code/config/dose_radiomics.yaml`. These stages require private imaging inputs and a separate PyRadiomics-capable environment. No images or masks are distributed here.
+SHAP describes global and individual prediction contributions. Supplementary analyses summarize observed RP proportions across joint strata and test standardized bilinear products in logistic regression. These logistic products are distinct from the square-root predictors used by the random forests.
 
-## Citation and availability
+## Outputs
 
-Please cite the associated article once published and identify the repository revision used. No DOI or acceptance status has been invented. Reuse and further data access may be discussed with the corresponding author.
+- `outputs/`: performance tables, selected-feature summaries, and local prediction files.
+- `outputs/journal_figures/`: feature-selection flow, ROC/calibration curves, SHAP plots, and feature correlations.
+- `outputs/supplement_S2_logistic/`: joint-stratum plots and logistic interaction statistics.
+
+Private inputs and generated outputs are excluded from Git by `.gitignore`.
+
+## Optional image processing
+
+1. Export CT, lung masks, and cumulative dose using 3D Slicer with SlicerRT and `code/slicer/extract_lung_ct_dose.py`. Configuration instructions are in `code/slicer/README.md`.
+2. Run `code/resample_dose.py` to align dose and masks at 2-mm spacing.
+3. Install `requirements_extraction.txt` in a PyRadiomics-compatible environment and run `code/extract_dose.py` to extract the 93 original-dose features.
+
+Extraction settings are stored in `code/config/dose_radiomics.yaml`.
+
+## Contact and data access
+
+Jie Huang, Xu Chen, Jiantao Wang, Shuai Liu, and Xueling Li.
+
+For questions or requests for additional study data, contact Xueling Li at **xlli@cmpt.ac.cn**, Hefei Cancer Hospital, Chinese Academy of Sciences. Access to nonpublic data is subject to institutional approval and patient privacy requirements.
