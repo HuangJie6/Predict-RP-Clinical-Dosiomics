@@ -1,0 +1,10 @@
+{
+  "input_root": "../data_private/dicom",
+  "output_root": "../data_private/slicer_volumes",
+  "case_name_filter_csv": "../data_private/cohort.csv",
+  "case_name_filter_column": "patient_id",
+  "output_extension": ".nrrd",
+  "require_complete_case": true,
+  "continue_on_error": true,
+  "overwrite": false
+}

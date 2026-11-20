@@ -1,0 +1,20 @@
+imageType:
+  Original: {}
+
+featureClass:
+  firstorder: []
+  glcm: []
+  glrlm: []
+  glszm: []
+  gldm: []
+  ngtdm: []
+
+setting:
+  label: 1
+  binWidth: 1.0
+  normalize: false
+  removeOutliers: null
+  minimumROIDimensions: 3
+  minimumROISize: 64
+  correctMask: true
+  additionalInfo: true

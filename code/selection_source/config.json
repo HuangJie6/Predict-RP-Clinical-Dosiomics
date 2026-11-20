@@ -1,0 +1,47 @@
+{
+  "input": {
+    "clinical_csv": "../data_private/cohort.csv",
+    "patient_id_column": "patient_id",
+    "label_column": "label",
+    "cohort_column": "cohort",
+    "training_values": [
+      "training"
+    ],
+    "require_exact_case_match": true
+  },
+  "modalities": [
+    {
+      "name": "clinical_features",
+      "feature_csv": "../data_private/cohort.csv"
+    },
+    {
+      "name": "dose_radiomics",
+      "feature_csv": "../data_private/dose_radiomics.csv"
+    }
+  ],
+  "output_root": "outputs",
+  "icc": {
+    "enabled": false,
+    "minimum_icc_2_1": 0.8,
+    "minimum_common_cases": 20,
+    "repeat_feature_files": {
+      "dose_radiomics": []
+    }
+  },
+  "selection": {
+    "maximum_missing_fraction": 0.1,
+    "variance_threshold": 0.0,
+    "maximum_pre_correlation_candidates": 150,
+    "spearman_correlation_threshold": 0.9,
+    "mutual_information_neighbors": 3,
+    "minimum_mi_candidates": 10,
+    "maximum_mi_candidates": 40,
+    "lasso_cv_folds": 5,
+    "lasso_c_values": 20,
+    "boruta_max_iter": 100,
+    "random_seed": 20261008,
+    "minimum_final_features": 3,
+    "maximum_final_features": 10,
+    "events_per_feature": 10
+  }
+}

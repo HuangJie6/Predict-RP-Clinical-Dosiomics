@@ -1,0 +1,72 @@
+{
+  "completed_at": "2026-11-19T22:20:55",
+  "fit_scope": "development_only:cohort",
+  "modalities": [
+    {
+      "modality": "clinical_features",
+      "feature_source": "D:\\Project_Files\\VSCode_Project\\RP_IJCARS_Final_20261119\\01_Private_Project\\data_private\\cohort.csv",
+      "fit_scope": "development_only:cohort",
+      "fit_cases": 108,
+      "all_available_cases": 155,
+      "class_counts_fit": {
+        "0": 60,
+        "1": 48
+      },
+      "initial_features": 29,
+      "after_missingness": 25,
+      "after_variance": 25,
+      "after_icc": 25,
+      "after_correlation": 25,
+      "mi_candidates": 25,
+      "lasso_selected": 21,
+      "boruta_confirmed": 2,
+      "boruta_tentative": 0,
+      "final_cap": 2,
+      "final_features": [
+        "TotalProtein",
+        "CEA"
+      ],
+      "icc": {
+        "status": "not_run",
+        "reason": "at least two repeat feature tables are required"
+      },
+      "correlation_threshold": 0.9,
+      "selection_pool": "lasso_and_boruta_confirmed",
+      "warning": null
+    },
+    {
+      "modality": "dose_radiomics",
+      "feature_source": "D:\\Project_Files\\VSCode_Project\\RP_IJCARS_Final_20261119\\01_Private_Project\\data_private\\dose_radiomics.csv",
+      "fit_scope": "development_only:cohort",
+      "fit_cases": 108,
+      "all_available_cases": 155,
+      "class_counts_fit": {
+        "0": 60,
+        "1": 48
+      },
+      "initial_features": 93,
+      "after_missingness": 93,
+      "after_variance": 93,
+      "after_icc": 93,
+      "after_correlation": 32,
+      "mi_candidates": 32,
+      "lasso_selected": 4,
+      "boruta_confirmed": 1,
+      "boruta_tentative": 0,
+      "final_cap": 4,
+      "final_features": [
+        "dose_original_glcm_Imc2",
+        "dose_original_glrlm_RunLengthNonUniformity",
+        "dose_original_glcm_MaximumProbability",
+        "dose_original_glcm_InverseVariance"
+      ],
+      "icc": {
+        "status": "not_run",
+        "reason": "at least two repeat feature tables are required"
+      },
+      "correlation_threshold": 0.9,
+      "selection_pool": "fallback_union_or_mi",
+      "warning": null
+    }
+  ]
+}
