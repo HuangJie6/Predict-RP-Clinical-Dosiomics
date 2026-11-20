@@ -17,17 +17,20 @@ def validate_public(path):
     with path.open(encoding='utf-8-sig',newline='') as handle:
         reader=csv.DictReader(handle);columns=reader.fieldnames;rows=list(reader)
     assert columns and columns[0]=='sample_id'
-    assert len(rows)==155 and len(columns)==94
-    assert all(c.startswith('dose_original_') for c in columns[1:])
+    assert len(rows)==155 and len(columns)==95
+    assert columns[-1]=='label'
+    assert all(c.startswith('dose_original_') for c in columns[1:-1])
     assert len({r['sample_id'] for r in rows})==155
-    assert all(math.isfinite(float(r[c])) for r in rows for c in columns[1:])
-    print('Public table passed: 155 samples, 93 numeric dose features; no outcome or clinical columns.')
+    assert all(math.isfinite(float(r[c])) for r in rows for c in columns[1:-1])
+    assert all(r['label'] in {'0','1'} for r in rows)
+    assert sum(r['label']=='1' for r in rows)==69
+    print('Public table passed: 155 samples, 93 numeric dose features; label: 69 RP, 86 non-RP.')
 
 def require_private():
     required=[ROOT/'data_private/cohort.csv', ROOT/'data_private/dose_radiomics.csv']
     absent=[p.name for p in required if not p.is_file()]
     if absent:
-        raise SystemExit('Authorized private inputs are required: '+', '.join(absent)+'. See README; the public feature table contains no labels or clinical data.')
+        raise SystemExit('Authorized private inputs are required: '+', '.join(absent)+'. See README; the public feature table contains labels but not clinical variables or original cohort assignments.')
 
 def select():
     subprocess.run([sys.executable,str(ROOT/'selection_source/run_03.py'),'--stage','all'],check=True)

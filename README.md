@@ -5,7 +5,7 @@ Python code for whole-lung dose-feature extraction, feature selection, random-fo
 ## Contents
 
 - `code/`: analysis scripts and configuration files.
-- `features/whole_lung_dosiomic_features.csv`: 155 samples with 93 extracted dose features and anonymous sample IDs.
+- `features/whole_lung_dosiomic_features.csv`: 155 samples with 93 extracted dose features, anonymous sample IDs, and binary RP labels.
 - `requirements.txt`: dependencies for feature selection, modeling, and visualization.
 - `requirements_extraction.txt`: additional dependencies for dose-feature extraction.
 
@@ -23,9 +23,11 @@ python -m pip install -r requirements.txt
 python code/run_analysis.py --stage validate-public
 ```
 
-This command uses the Python standard library to check dimensions, unique sample IDs, and finite feature values. The table contains original-scale whole-lung dosiomic features extracted with PyRadiomics. Extraction used a 1-Gy bin width and 2-mm isotropic voxel spacing. See `features/README.md` for the column structure.
+This command uses the Python standard library to check dimensions, unique sample IDs, finite feature values, and binary labels. The table contains original-scale whole-lung dosiomic features extracted with PyRadiomics. Extraction used a 1-Gy bin width and 2-mm isotropic voxel spacing. See `features/README.md` for the column structure.
 
-Clinical variables, RP labels, cohort assignments, images, dose volumes, and masks are not included. Supervised analyses require the corresponding private inputs described below.
+The `label` column encodes RP as `1` (69 samples) and non-RP as `0` (86 samples). It is the prediction target and must not be included among input features.
+
+Clinical variables, cohort assignments, images, dose volumes, and masks are not included. The public table supports dose-only supervised analyses; reproducing the original combined models and fixed-split results requires the private inputs described below.
 
 ## Run the analysis
 
